@@ -2,7 +2,7 @@ package memory
 
 import (
 	"context"
-	"github.com/rpatton4/mesbg-league/player/pkg/model"
+	"github.com/rpatton4/mesbg-league/players/pkg/model"
 	"github.com/rpatton4/mesbg-league/svcerrors"
 	"strconv"
 	"sync"
@@ -11,13 +11,13 @@ import (
 // Counter for Player IDs
 var playerCounter = 1
 
-// Repository defines an in-memory repository for player data
+// Repository defines an in-memory repository for players data
 type Repository struct {
 	sync.RWMutex
 	data map[int]*model.Player
 }
 
-// New creates a new instance of the in-memory player repository.
+// New creates a new instance of the in-memory players repository.
 func New() *Repository {
 	return &Repository{data: map[int]*model.Player{}}
 }
@@ -35,7 +35,7 @@ func (r *Repository) Get(_ context.Context, id int) (*model.Player, error) {
 	return person, nil
 }
 
-// Add persists a new player instance to the in-memory repository and returns the player with an assigned ID.
+// Add persists a new players instance to the in-memory repository and returns the players with an assigned ID.
 func (r *Repository) Add(_ context.Context, player *model.Player) (*model.Player, error) {
 	r.Lock()
 	defer r.Unlock()
@@ -46,7 +46,7 @@ func (r *Repository) Add(_ context.Context, player *model.Player) (*model.Player
 	return player, svcerrors.NotFound
 }
 
-// Update updates an existing player instance in the in-memory repository.
+// Update updates an existing players instance in the in-memory repository.
 func (r *Repository) Update(_ context.Context, p *model.Player) (*model.Player, error) {
 	r.Lock()
 	defer r.Unlock()

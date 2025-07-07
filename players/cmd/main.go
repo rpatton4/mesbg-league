@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/rpatton4/mesbg-league/player/internal/controller/player"
-	handlerhttp "github.com/rpatton4/mesbg-league/player/internal/handler/http"
-	"github.com/rpatton4/mesbg-league/player/internal/repository/memory"
+	"github.com/rpatton4/mesbg-league/players/internal/controller/player"
+	handlerhttp "github.com/rpatton4/mesbg-league/players/internal/handler/http"
+	"github.com/rpatton4/mesbg-league/players/internal/repository/memory"
 	"log/slog"
 	"net/http"
 )
