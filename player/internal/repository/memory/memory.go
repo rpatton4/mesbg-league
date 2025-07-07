@@ -3,28 +3,56 @@ package memory
 import (
 	"context"
 	"github.com/rpatton4/mesbg-league/player/pkg/model"
+	"github.com/rpatton4/mesbg-league/svcerrors"
+	"strconv"
 	"sync"
 )
+
+// Counter for Player IDs
+var playerCounter = 1
 
 // Repository defines an in-memory repository for player data
 type Repository struct {
 	sync.RWMutex
-	data map[string]*model.Person
+	data map[int]*model.Player
 }
 
+// New creates a new instance of the in-memory player repository.
 func New() *Repository {
-	return &Repository{data: map[string]*model.Person{}}
+	return &Repository{data: map[int]*model.Player{}}
 }
 
-// Get retrieves a person by ID from the in-memory repository, if not person with the given
+// Get retrieves a person by ID from the in-memory repository, if no person with the given
 // ID exists, it returns nil.
-func (r *Repository) Get(_ context.Context, id string) *model.Person {
+func (r *Repository) Get(_ context.Context, id int) (*model.Player, error) {
 	r.RLock()
 	defer r.RUnlock()
 
 	person, exists := r.data[id]
 	if !exists {
-		return nil
+		return nil, svcerrors.NotFound
 	}
-	return person
+	return person, nil
+}
+
+// Add persists a new player instance to the in-memory repository and returns the player with an assigned ID.
+func (r *Repository) Add(_ context.Context, player *model.Player) (*model.Player, error) {
+	r.Lock()
+	defer r.Unlock()
+	player.ID = string(playerCounter)
+	r.data[playerCounter] = player
+	playerCounter++
+
+	return player, svcerrors.NotFound
+}
+
+// Update updates an existing player instance in the in-memory repository.
+func (r *Repository) Update(_ context.Context, p *model.Player) (*model.Player, error) {
+	r.Lock()
+	defer r.Unlock()
+
+	id, _ := strconv.Atoi(p.ID)
+	r.data[id] = p
+
+	return p, nil
 }
