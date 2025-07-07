@@ -9,7 +9,7 @@ type playerRepository interface {
 	Get(ctx context.Context, id int) (*model.Player, error)
 }
 
-// Controller defines the simple controller for players operations.
+// Controller defines the simple controller for player operations.
 type Controller struct {
 	repo playerRepository
 }
@@ -19,7 +19,7 @@ func New(r playerRepository) *Controller {
 	return &Controller{repo: r}
 }
 
-// Get returns the players with the given id, or nil if no players with that id exists
+// Get returns the player with the given id, or svcerrors.NotFound if no player with that id exists
 func (c *Controller) Get(ctx context.Context, id int) (*model.Player, error) {
 	return c.repo.Get(ctx, id)
 }

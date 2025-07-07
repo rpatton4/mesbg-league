@@ -39,7 +39,7 @@ func (r *Repository) Get(_ context.Context, id int) (*model.Player, error) {
 func (r *Repository) Add(_ context.Context, player *model.Player) (*model.Player, error) {
 	r.Lock()
 	defer r.Unlock()
-	player.ID = string(playerCounter)
+	player.ID = strconv.Itoa(playerCounter)
 	r.data[playerCounter] = player
 	playerCounter++
 

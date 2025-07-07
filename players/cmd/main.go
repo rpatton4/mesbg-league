@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	slog.Info("Starting the Player service...")
+	slog.Info("Starting the Players service...")
 	repo := memory.New()
 	ctrl := player.New(repo)
 	handler := handlerhttp.New(ctrl)
