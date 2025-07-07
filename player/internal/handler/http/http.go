@@ -32,6 +32,7 @@ func (h *Handler) GetPlayer(w http.ResponseWriter, r *http.Request) {
 	p, err := h.ctrl.Get(ctx, id)
 
 	if err != nil && errors.Is(err, svcerrors.NotFound) {
+		slog.Warn("Player not found", "playerID", id)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if err != nil {
