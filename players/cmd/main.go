@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/rpatton4/mesbg-league/players/internal/controller/player"
+	"github.com/rpatton4/mesbg-league/players/internal/controller/players"
 	handlerhttp "github.com/rpatton4/mesbg-league/players/internal/handler/http"
 	"github.com/rpatton4/mesbg-league/players/internal/repository/memory"
 	"log/slog"
@@ -11,7 +11,7 @@ import (
 func main() {
 	slog.Info("Starting the Players service...")
 	repo := memory.New()
-	ctrl := player.New(repo)
+	ctrl := players.New(repo)
 	handler := handlerhttp.New(ctrl)
 
 	http.Handle("/players", http.HandlerFunc(handler.GetPlayer))

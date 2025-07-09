@@ -1,6 +1,8 @@
 package model
 
-import "github.com/rpatton4/mesbg-league/auth"
+import (
+	"github.com/rpatton4/mesbg-league/pkg/auth"
+)
 
 type Player struct {
 	ID            string          `json:"id"`

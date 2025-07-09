@@ -3,7 +3,7 @@ package http
 import (
 	"encoding/json"
 	"errors"
-	"github.com/rpatton4/mesbg-league/leagues/internal/controller/league"
+	"github.com/rpatton4/mesbg-league/leagues/internal/controller/leagues"
 	"github.com/rpatton4/mesbg-league/svcerrors"
 	"log/slog"
 	"net/http"
@@ -12,11 +12,11 @@ import (
 
 // Handler defines the HTTP handler for league operations.
 type Handler struct {
-	ctrl *league.Controller
+	ctrl *leagues.Controller
 }
 
 // New creates a new instance of the HTTP handler for league operations.
-func New(c *league.Controller) *Handler {
+func New(c *leagues.Controller) *Handler {
 	return &Handler{ctrl: c}
 }
 

@@ -1,4 +1,4 @@
-package league
+package leagues
 
 import (
 	"context"
