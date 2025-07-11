@@ -6,7 +6,7 @@ import (
 )
 
 type playerRepository interface {
-	Get(ctx context.Context, id int) (*model.Player, error)
+	Get(ctx context.Context, id model.PlayerID) (*model.Player, error)
 }
 
 // Controller defines the simple controller for player operations.
@@ -20,6 +20,6 @@ func New(r playerRepository) *Controller {
 }
 
 // Get returns the player with the given id, or svcerrors.NotFound if no player with that id exists
-func (c *Controller) Get(ctx context.Context, id int) (*model.Player, error) {
+func (c *Controller) Get(ctx context.Context, id model.PlayerID) (*model.Player, error) {
 	return c.repo.Get(ctx, id)
 }

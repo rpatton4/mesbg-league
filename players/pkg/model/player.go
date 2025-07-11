@@ -4,8 +4,10 @@ import (
 	"github.com/rpatton4/mesbg-league/pkg/auth"
 )
 
+type PlayerID string
+
 type Player struct {
-	ID            string          `json:"id"`
+	ID            PlayerID        `json:"id"`
 	Name          string          `json:"name"`
 	DiscordName   string          `json:"discordName"`
 	SocialMediaID string          `json:"socialMediaUserId"`

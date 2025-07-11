@@ -1,13 +1,8 @@
 package http
 
 import (
-	"encoding/json"
-	"errors"
 	"github.com/rpatton4/mesbg-league/players/internal/controller/players"
-	"github.com/rpatton4/mesbg-league/svcerrors"
-	"log/slog"
 	"net/http"
-	"strconv"
 )
 
 // Handler defines the HTTP handler for players operations.
@@ -20,10 +15,26 @@ func New(c *players.Controller) *Handler {
 	return &Handler{ctrl: c}
 }
 
-func (h *Handler) GetPlayer(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.FormValue("id"))
-	if err != nil {
-		slog.Error("Invalid players ID", "error", err)
+func (h *Handler) Demultiplex(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		getPlayer(w, r)
+		return
+	case http.MethodPost:
+		postPlayer(w, r)
+		return
+	case http.MethodPut:
+		putPlayer(w, r)
+		return
+	case http.MethodDelete:
+		deletePlayer(w, r)
+		return
+	}
+	/**
+	id := model.PlayerID(r.FormValue("id"))
+	//id, err := strconv.Atoi(r.FormValue("id"))
+	if id == "" {
+		slog.Error("Missing players ID")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -45,4 +56,21 @@ func (h *Handler) GetPlayer(w http.ResponseWriter, r *http.Request) {
 		slog.Error("Failed to encode players response", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
+	**/
+}
+
+func getPlayer(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func postPlayer(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func putPlayer(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func deletePlayer(w http.ResponseWriter, r *http.Request) {
+
 }
