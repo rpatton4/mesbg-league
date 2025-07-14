@@ -1,0 +1,10 @@
+{
+    "side1Id": "111",
+    "side2Id": "222",
+    "roundId": "333",
+    "side1TotalVictoryPoints": 10,
+    "side2TotalVictoryPoints": 20,
+    "side1KilledGeneral": true,
+    "Side2KilledGeneral": false,
+    "status": 2
+}
