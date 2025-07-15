@@ -61,12 +61,16 @@ func (r *Repository) Replace(_ context.Context, g *model.Game) (*model.Game, err
 	return g, nil
 }
 
-// Delete deletes an existing game instance in the in-memory repository.
-func (r *Repository) Delete(_ context.Context, id model.GameID) error {
+// DeleteByID deletes an existing game instance in the in-memory repository. Returns true if the game was found and
+// deleted, false otherwise. This is an idempotent operation.
+func (r *Repository) DeleteByID(_ context.Context, id model.GameID) bool {
 	r.Lock()
 	defer r.Unlock()
 
-	r.data[id] = nil
+	if r.data[id] != nil {
+		r.data[id] = nil
+		return true
+	}
 
-	return nil
+	return false
 }

@@ -1,0 +1,2 @@
+# Ignore the executable used to run the Participants service locally for testing
+main

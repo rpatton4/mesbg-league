@@ -19,7 +19,7 @@ func main() {
 	handler := handlerhttp.New(ctrl)
 
 	mux := http.NewServeMux()
-	mux.Handle("/games/{id}", http.HandlerFunc(handler.GetByID))
+	mux.Handle("/games/{id}", http.HandlerFunc(handler.DemuxWithID))
 	mux.Handle("/games", http.HandlerFunc(handler.Demux))
 	if err := http.ListenAndServe(":8081", mux); err != nil {
 		slog.Error("Failed to start HTTP server", "error", err.Error())

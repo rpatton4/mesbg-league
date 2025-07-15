@@ -13,17 +13,17 @@ var participantCounter = 1
 // Repository defines an in-memory repository for participant data
 type Repository struct {
 	sync.RWMutex
-	data map[int]*model.Participant
+	data map[model.ParticipantID]*model.Participant
 }
 
 // New creates a new instance of the in-memory participant repository.
 func New() *Repository {
-	return &Repository{data: map[int]*model.Participant{}}
+	return &Repository{data: map[model.ParticipantID]*model.Participant{}}
 }
 
 // Get retrieves a participant by ID from the in-memory repository, if no participant with the given
 // ID exists, it returns NotFound.
-func (r *Repository) Get(_ context.Context, id int) (*model.Participant, error) {
+func (r *Repository) GetByID(_ context.Context, id model.ParticipantID) (*model.Participant, error) {
 	r.RLock()
 	defer r.RUnlock()
 
@@ -35,23 +35,41 @@ func (r *Repository) Get(_ context.Context, id int) (*model.Participant, error) 
 }
 
 // Add persists a new participant instance to the in-memory repository and returns the participant with an assigned ID.
-func (r *Repository) Add(_ context.Context, l *model.Participant) (*model.Participant, error) {
+func (r *Repository) Create(_ context.Context, p *model.Participant) (*model.Participant, error) {
 	r.Lock()
 	defer r.Unlock()
-	l.ID = strconv.Itoa(participantCounter)
-	r.data[participantCounter] = l
+	p.ID = model.ParticipantID(strconv.Itoa(participantCounter))
+	r.data[p.ID] = p
 	participantCounter++
 
-	return l, svcerrors.NotFound
+	return p, svcerrors.NotFound
 }
 
-// Update updates an existing participant instance in the in-memory repository.
-func (r *Repository) Update(_ context.Context, p *model.Participant) (*model.Participant, error) {
+// Replace completely replaces an existing participant instance with the provided one, using the ID from the provided participant
+// to find which participant to replace. This cannot be used to create a new participant, and it is an idempotent operation.
+// This is an intended equivalent to the HTTP PUT operation, though it purposefully does not allow the create which
+// PUT is sometimes interpreted as allowing (because that leaves ID creation up to the client).
+func (r *Repository) Replace(_ context.Context, p *model.Participant) (*model.Participant, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	id, _ := strconv.Atoi(p.ID)
-	r.data[id] = p
-
+	if p.ID == "" || r.data[p.ID] == nil {
+		return nil, svcerrors.InvalidID
+	}
+	r.data[p.ID] = p
 	return p, nil
+}
+
+// DeleteByID deletes an existing participant instance in the in-memory repository. Returns true if the participant was found and
+// deleted, false otherwise. This is an idempotent operation.
+func (r *Repository) DeleteByID(_ context.Context, id model.ParticipantID) bool {
+	r.Lock()
+	defer r.Unlock()
+
+	if r.data[id] != nil {
+		r.data[id] = nil
+		return true
+	}
+
+	return false
 }

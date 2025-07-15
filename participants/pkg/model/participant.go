@@ -1,10 +1,12 @@
 package model
 
+type ParticipantID string
+
 // Participant represents a player in a gaming league, linking the player to the league along with
 // their performance metrics in the league.
 type Participant struct {
 	// ID is the unique identifier for the participant
-	ID string `json:"id"`
+	ID ParticipantID `json:"id,omitempty"`
 
 	// PlayerID is the unique identifier for the player
 	PlayerID string `json:"playerId"`
@@ -13,11 +15,11 @@ type Participant struct {
 	LeagueID string `json:"leagueId"`
 
 	// VictoryPointsScored tracks the current total victory points scored by the participant in the league
-	VictoryPointsScored int `json:"victoryPointsScored"`
+	VictoryPointsScored int `json:"victoryPointsScored,omitempty"`
 
 	// VictoryPointsConceded records the current total victory points scored against the participant in the league
-	VictoryPointsConceded int `json:"victoryPointsConceded"`
+	VictoryPointsConceded int `json:"victoryPointsConceded,omitempty"`
 
 	// GeneralsKilled records the current total number of opposing generals killed by the participant in the league
-	GeneralsKilled int `json:"generalsKilled"`
+	GeneralsKilled int `json:"generalsKilled,omitempty"`
 }
