@@ -3,14 +3,15 @@ package games
 import (
 	"context"
 	"errors"
+	"github.com/rpatton4/mesbg-league/games/pkg/header"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
 )
 
 type gamesRepository interface {
-	GetByID(ctx context.Context, id model.GameID) (*model.Game, error)
+	GetByID(ctx context.Context, id header.GameID) (*model.Game, error)
 	Create(ctx context.Context, g *model.Game) (*model.Game, error)
 	Replace(ctx context.Context, g *model.Game) (*model.Game, error)
-	DeleteByID(ctx context.Context, id model.GameID) bool
+	DeleteByID(ctx context.Context, id header.GameID) bool
 }
 
 // Controller defines the simple controller for game operations.
@@ -24,7 +25,7 @@ func New(r gamesRepository) *Controller {
 }
 
 // GetByID returns the game with the given id, or a svcerrors.NotFound if no game with that id exists
-func (c *Controller) GetByID(ctx context.Context, id model.GameID) (*model.Game, error) {
+func (c *Controller) GetByID(ctx context.Context, id header.GameID) (*model.Game, error) {
 	return c.repo.GetByID(ctx, id)
 }
 
@@ -49,7 +50,7 @@ func (c *Controller) Replace(ctx context.Context, g *model.Game) (*model.Game, e
 
 // DeleteByID removes the game with the given id from the repository. Returns true if the game was found and
 // deleted, false otherwise. This is an idempotent operation.
-func (c *Controller) DeleteByID(ctx context.Context, id model.GameID) bool {
+func (c *Controller) DeleteByID(ctx context.Context, id header.GameID) bool {
 	if id == "" {
 		return false
 	}

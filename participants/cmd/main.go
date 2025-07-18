@@ -21,7 +21,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/participants/{id}", http.HandlerFunc(handler.DemuxWithID))
 	mux.Handle("/participants", http.HandlerFunc(handler.Demux))
-	if err := http.ListenAndServe(":8081", nil); err != nil {
+	if err := http.ListenAndServe(":8083", nil); err != nil {
 		slog.Error("Failed to start HTTP server", "error", err.Error())
 		panic(err)
 	}

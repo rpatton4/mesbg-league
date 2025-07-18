@@ -1,10 +1,10 @@
 package model
 
-type GameID string
+import "github.com/rpatton4/mesbg-league/games/pkg/header"
 
 type Game struct {
 	// ID is the unique identifier for the game
-	ID GameID `json:"id,omitempty"`
+	ID header.GameID `json:"id,omitempty"`
 
 	// Side1ID is the identifier of the player for the first side in the game.
 	// Second does not imply that this player acts first, it is simply a designator

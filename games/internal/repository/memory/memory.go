@@ -2,8 +2,9 @@ package memory
 
 import (
 	"context"
+	"github.com/rpatton4/mesbg-league/games/pkg/header"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
-	"github.com/rpatton4/mesbg-league/svcerrors"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 	"strconv"
 	"sync"
 )
@@ -13,17 +14,17 @@ var gameCounter = 1
 // Repository defines an in-memory repository for game data
 type Repository struct {
 	sync.RWMutex
-	data map[model.GameID]*model.Game
+	data map[header.GameID]*model.Game
 }
 
 // New creates a new instance of the in-memory game repository.
 func New() *Repository {
-	return &Repository{data: map[model.GameID]*model.Game{}}
+	return &Repository{data: map[header.GameID]*model.Game{}}
 }
 
 // GetByID retrieves a game by ID from the in-memory repository, if no game with the given
 // ID exists, it returns NotFound.
-func (r *Repository) GetByID(_ context.Context, id model.GameID) (*model.Game, error) {
+func (r *Repository) GetByID(_ context.Context, id header.GameID) (*model.Game, error) {
 	r.RLock()
 	defer r.RUnlock()
 
@@ -31,6 +32,7 @@ func (r *Repository) GetByID(_ context.Context, id model.GameID) (*model.Game, e
 	if !exists {
 		return nil, svcerrors.NotFound
 	}
+
 	return g, nil
 }
 
@@ -39,7 +41,7 @@ func (r *Repository) Create(_ context.Context, g *model.Game) (*model.Game, erro
 	r.Lock()
 	defer r.Unlock()
 
-	g.ID = model.GameID(strconv.Itoa(gameCounter))
+	g.ID = header.GameID(strconv.Itoa(gameCounter))
 	r.data[g.ID] = g
 	gameCounter++
 
@@ -63,7 +65,7 @@ func (r *Repository) Replace(_ context.Context, g *model.Game) (*model.Game, err
 
 // DeleteByID deletes an existing game instance in the in-memory repository. Returns true if the game was found and
 // deleted, false otherwise. This is an idempotent operation.
-func (r *Repository) DeleteByID(_ context.Context, id model.GameID) bool {
+func (r *Repository) DeleteByID(_ context.Context, id header.GameID) bool {
 	r.Lock()
 	defer r.Unlock()
 

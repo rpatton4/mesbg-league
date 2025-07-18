@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/rpatton4/mesbg-league/games/internal/controller/games"
+	"github.com/rpatton4/mesbg-league/games/pkg/header"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
-	"github.com/rpatton4/mesbg-league/svcerrors"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 	"io"
 	"log/slog"
 	"net/http"
@@ -25,7 +26,7 @@ func New(c *games.Controller) *Handler {
 // DemuxWithID takes a request with a game ID at the end of the path and routes it to the appropriate handler method.
 // Assumes the path has a value called "id" which is a game ID
 func (h *Handler) DemuxWithID(w http.ResponseWriter, r *http.Request) {
-	id := model.GameID(r.PathValue("id"))
+	id := header.GameID(r.PathValue("id"))
 	slog.Debug("DemuxWithID called", "id", id)
 
 	switch r.Method {
@@ -59,11 +60,11 @@ func (h *Handler) Demux(w http.ResponseWriter, r *http.Request) {
 
 // httpGetByID queries the controller for the game with the ID taken from the path, returns it if found
 // Any errors are sent directly out to the HTTP stream
-func httpGetByID(h *Handler, w http.ResponseWriter, r *http.Request, id model.GameID) {
+func httpGetByID(h *Handler, w http.ResponseWriter, r *http.Request, id header.GameID) {
 	slog.Debug("httpGetByID called", "gameID", id)
 
 	ctx := r.Context()
-	g, err := h.ctrl.GetByID(ctx, model.GameID(id))
+	g, err := h.ctrl.GetByID(ctx, header.GameID(id))
 
 	if err != nil && errors.Is(err, svcerrors.NotFound) {
 		slog.Warn("Game not found", "gameID", id)
@@ -115,7 +116,7 @@ func httpPost(h *Handler, w http.ResponseWriter, r *http.Request) {
 
 // httpPutWithID replaces the game with the given ID from the path with the one passed in.
 // Any errors or ok responses are sent directly out to the HTTP stream
-func httpPutWithID(h *Handler, w http.ResponseWriter, r *http.Request, id model.GameID) {
+func httpPutWithID(h *Handler, w http.ResponseWriter, r *http.Request, id header.GameID) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		slog.Error("Failed to read request body", "error", err)
@@ -152,7 +153,7 @@ func httpPutWithID(h *Handler, w http.ResponseWriter, r *http.Request, id model.
 
 // httpDeleteByID deletes the game with the given ID from the path.
 // Any errors or ok responses are sent directly out to the HTTP stream
-func httpDeleteByID(h *Handler, w http.ResponseWriter, r *http.Request, id model.GameID) {
+func httpDeleteByID(h *Handler, w http.ResponseWriter, r *http.Request, id header.GameID) {
 	slog.Info("httpDeleteByID called", "gameID", id)
 	ok := h.ctrl.DeleteByID(r.Context(), id)
 	if !ok {

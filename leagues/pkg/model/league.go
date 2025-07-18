@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/rpatton4/mesbg-league/leagues/pkg/header"
 	participants "github.com/rpatton4/mesbg-league/participants/pkg/model"
 	rounds "github.com/rpatton4/mesbg-league/rounds/pkg/model"
 )
@@ -9,7 +10,7 @@ import (
 // and the games played within it.
 type League struct {
 	// ID is the unique identifier for the league
-	ID string `json:"id"`
+	ID header.LeagueID `json:"id"`
 
 	// Active indicates whether the league is currently either not yet started or in progress (true) or has ended (false)
 	Active bool `json:"active"`
@@ -22,7 +23,7 @@ type League struct {
 
 	// Rounds is a slice of the rounds in the league, both those which have occurred and those which are upcoming
 	Rounds []*rounds.Round `json:"rounds"`
-	
+
 	// NumberOfGames is the total number of games in the league
 	NumberOfGames int `json:"numberOfGames"`
 

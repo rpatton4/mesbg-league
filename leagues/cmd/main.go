@@ -15,7 +15,7 @@ func main() {
 	handler := handlerhttp.New(ctrl)
 
 	http.Handle("/leagues", http.HandlerFunc(handler.GetLeague))
-	if err := http.ListenAndServe(":8081", nil); err != nil {
+	if err := http.ListenAndServe(":8082", nil); err != nil {
 		slog.Error("Failed to start HTTP server", "error", err.Error())
 		panic(err)
 	}

@@ -2,8 +2,8 @@ package memory
 
 import (
 	"context"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 	"github.com/rpatton4/mesbg-league/players/pkg/model"
-	"github.com/rpatton4/mesbg-league/svcerrors"
 	"strconv"
 	"sync"
 )
