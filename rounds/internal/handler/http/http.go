@@ -3,8 +3,8 @@ package http
 import (
 	"encoding/json"
 	"errors"
-	"github.com/rpatton4/mesbg-league/rounds/internal/controller/rounds"
-	"github.com/rpatton4/mesbg-league/svcerrors"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
+	"github.com/rpatton4/mesbg-league/rounds/internal/domain"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -12,11 +12,11 @@ import (
 
 // Handler defines the HTTP handler for round operations.
 type Handler struct {
-	ctrl *rounds.Controller
+	ctrl *domain.Controller
 }
 
 // New creates a new instance of the HTTP handler for round operations.
-func New(c *rounds.Controller) *Handler {
+func New(c *domain.Controller) *Handler {
 	return &Handler{ctrl: c}
 }
 

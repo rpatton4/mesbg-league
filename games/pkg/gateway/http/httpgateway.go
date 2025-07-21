@@ -10,15 +10,15 @@ import (
 	"net/http"
 )
 
-type Gateway struct {
+type HTTPGateway struct {
 	addr string
 }
 
-func New(addr string) *Gateway {
-	return &Gateway{addr: addr}
+func New(addr string) *HTTPGateway {
+	return &HTTPGateway{addr: addr}
 }
 
-func (g *Gateway) GetByID(ctx context.Context, id gamesheader.GameID) (*games.Game, error) {
+func (g *HTTPGateway) GetByID(ctx context.Context, id gamesheader.GameID) (*games.Game, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, g.addr+"/"+string(id), nil)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (g *Gateway) GetByID(ctx context.Context, id gamesheader.GameID) (*games.Ga
 	}
 
 	defer resp.Body.Close()
-	
+
 	if resp.StatusCode != http.StatusNotFound {
 		return nil, svcerrors.NotFound
 	} else if resp.StatusCode/100 != 2 {

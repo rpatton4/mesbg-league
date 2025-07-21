@@ -26,7 +26,7 @@ type Round struct {
 	Games []games.Game `json:"games,omitempty"`
 }
 
-type RoundLite struct {
+type ShallowRound struct {
 	// ID is the unique identifier for the round
 	ID header.RoundID `json:"id,omitempty"`
 

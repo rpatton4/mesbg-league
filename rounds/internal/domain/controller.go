@@ -1,4 +1,4 @@
-package rounds
+package domain
 
 import (
 	"context"

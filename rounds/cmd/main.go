@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/rpatton4/mesbg-league/rounds/internal/controller/rounds"
+	"github.com/rpatton4/mesbg-league/rounds/internal/domain"
 	handlerhttp "github.com/rpatton4/mesbg-league/rounds/internal/handler/http"
 	"github.com/rpatton4/mesbg-league/rounds/internal/repository/memory"
 	"log/slog"
@@ -11,7 +11,7 @@ import (
 func main() {
 	slog.Info("Starting the Rounds service...")
 	repo := memory.New()
-	ctrl := rounds.New(repo)
+	ctrl := domain.New(repo)
 	handler := handlerhttp.New(ctrl)
 
 	http.Handle("/players", http.HandlerFunc(handler.GetRound))
