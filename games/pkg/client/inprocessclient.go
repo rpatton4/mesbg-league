@@ -1,8 +1,8 @@
-package inprocess
+package client
 
 import (
 	"context"
-	gamesctrl "github.com/rpatton4/mesbg-league/games/internal/controller/games"
+	gamesctrl "github.com/rpatton4/mesbg-league/games/internal/inbound"
 	gamesheader "github.com/rpatton4/mesbg-league/games/pkg/header"
 	games "github.com/rpatton4/mesbg-league/games/pkg/model"
 )

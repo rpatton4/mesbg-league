@@ -1,10 +1,9 @@
-package http
+package inbound
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/rpatton4/mesbg-league/games/internal/controller/games"
 	"github.com/rpatton4/mesbg-league/games/pkg/header"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
 	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
@@ -15,11 +14,11 @@ import (
 
 // Handler defines the HTTP handler for game operations.
 type Handler struct {
-	ctrl *games.Controller
+	ctrl *Controller
 }
 
 // New creates a new instance of the HTTP handler for game operations.
-func New(c *games.Controller) *Handler {
+func New(c *Controller) *Handler {
 	return &Handler{ctrl: c}
 }
 

@@ -1,4 +1,4 @@
-package games
+package inbound
 
 import (
 	"context"

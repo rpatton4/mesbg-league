@@ -1,9 +1,8 @@
 package main
 
 import (
-	"github.com/rpatton4/mesbg-league/games/internal/controller/games"
-	handlerhttp "github.com/rpatton4/mesbg-league/games/internal/handler/http"
-	"github.com/rpatton4/mesbg-league/games/internal/repository/memory"
+	"github.com/rpatton4/mesbg-league/games/internal/inbound"
+	"github.com/rpatton4/mesbg-league/games/internal/outbound"
 	"log/slog"
 	"net/http"
 	"os"
@@ -14,9 +13,9 @@ func main() {
 	slog.SetDefault(slog.New(logHandler))
 
 	slog.Info("Starting the Games service...")
-	repo := memory.New()
-	ctrl := games.New(repo)
-	handler := handlerhttp.New(ctrl)
+	repo := outbound.New()
+	ctrl := inbound.New(repo)
+	handler := inbound.New(ctrl)
 
 	mux := http.NewServeMux()
 	mux.Handle("/games/{id}", http.HandlerFunc(handler.DemuxWithID))
