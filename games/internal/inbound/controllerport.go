@@ -19,7 +19,7 @@ type Controller struct {
 	repo gamesRepository
 }
 
-// New creates a new instance of the games controller.
+// NewHTTPHandler creates a new instance of the games controller.
 func New(r gamesRepository) *Controller {
 	return &Controller{repo: r}
 }

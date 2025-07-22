@@ -12,19 +12,19 @@ import (
 	"net/http"
 )
 
-// Handler defines the HTTP handler for game operations.
-type Handler struct {
+// HTTPHandler defines the HTTP handler (adapter) for Games operations received via HTTP(S).
+type HTTPHandler struct {
 	ctrl *Controller
 }
 
-// New creates a new instance of the HTTP handler for game operations.
-func New(c *Controller) *Handler {
-	return &Handler{ctrl: c}
+// NewHTTPHandler creates a new instance of the HTTP handler for game operations.
+func NewHTTPHandler(c *Controller) *HTTPHandler {
+	return &HTTPHandler{ctrl: c}
 }
 
 // DemuxWithID takes a request with a game ID at the end of the path and routes it to the appropriate handler method.
 // Assumes the path has a value called "id" which is a game ID
-func (h *Handler) DemuxWithID(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPHandler) DemuxWithID(w http.ResponseWriter, r *http.Request) {
 	id := header.GameID(r.PathValue("id"))
 	slog.Debug("DemuxWithID called", "id", id)
 
@@ -46,7 +46,7 @@ func (h *Handler) DemuxWithID(w http.ResponseWriter, r *http.Request) {
 
 // Demux is the HTTP handler that routes requests to the appropriate method based on the HTTP method used, with the
 // exception of calls when an ID is in the path, which are handled by the DemuxWithID method
-func (h *Handler) Demux(w http.ResponseWriter, r *http.Request) {
+func (h *HTTPHandler) Demux(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		httpPost(h, w, r)
@@ -59,7 +59,7 @@ func (h *Handler) Demux(w http.ResponseWriter, r *http.Request) {
 
 // httpGetByID queries the controller for the game with the ID taken from the path, returns it if found
 // Any errors are sent directly out to the HTTP stream
-func httpGetByID(h *Handler, w http.ResponseWriter, r *http.Request, id header.GameID) {
+func httpGetByID(h *HTTPHandler, w http.ResponseWriter, r *http.Request, id header.GameID) {
 	slog.Debug("httpGetByID called", "gameID", id)
 
 	ctx := r.Context()
@@ -85,7 +85,7 @@ func httpGetByID(h *Handler, w http.ResponseWriter, r *http.Request, id header.G
 
 // httpPost reads the game json from the HTTP call and sends it on to the controller
 // Any errors are sent directly out to the HTTP stream
-func httpPost(h *Handler, w http.ResponseWriter, r *http.Request) {
+func httpPost(h *HTTPHandler, w http.ResponseWriter, r *http.Request) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		slog.Error("Failed to read request body", "error", err)
@@ -115,7 +115,7 @@ func httpPost(h *Handler, w http.ResponseWriter, r *http.Request) {
 
 // httpPutWithID replaces the game with the given ID from the path with the one passed in.
 // Any errors or ok responses are sent directly out to the HTTP stream
-func httpPutWithID(h *Handler, w http.ResponseWriter, r *http.Request, id header.GameID) {
+func httpPutWithID(h *HTTPHandler, w http.ResponseWriter, r *http.Request, id header.GameID) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		slog.Error("Failed to read request body", "error", err)
@@ -152,7 +152,7 @@ func httpPutWithID(h *Handler, w http.ResponseWriter, r *http.Request, id header
 
 // httpDeleteByID deletes the game with the given ID from the path.
 // Any errors or ok responses are sent directly out to the HTTP stream
-func httpDeleteByID(h *Handler, w http.ResponseWriter, r *http.Request, id header.GameID) {
+func httpDeleteByID(h *HTTPHandler, w http.ResponseWriter, r *http.Request, id header.GameID) {
 	slog.Info("httpDeleteByID called", "gameID", id)
 	ok := h.ctrl.DeleteByID(r.Context(), id)
 	if !ok {

@@ -13,9 +13,9 @@ func main() {
 	slog.SetDefault(slog.New(logHandler))
 
 	slog.Info("Starting the Games service...")
-	repo := outbound.New()
-	ctrl := inbound.New(repo)
-	handler := inbound.New(ctrl)
+	repo := outbound.NewMemoryRepository()
+	ctrl := inbound.NewHTTPHandler(repo)
+	handler := inbound.NewHTTPHandler(ctrl)
 
 	mux := http.NewServeMux()
 	mux.Handle("/games/{id}", http.HandlerFunc(handler.DemuxWithID))
