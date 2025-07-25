@@ -26,6 +26,7 @@ func main() {
 	api := humago.New(router, huma.DefaultConfig("Games Service", "1.0.0"))
 
 	huma.Get(api, "/games/{id}", handler.HumaGetByID)
+	huma.Post(api, "/games", handler.HumaPost)
 	//mux.Handle("/games/{id}", http.HandlerFunc(handler.DemuxWithID))
 	//mux.Handle("/games", http.HandlerFunc(handler.Demux))
 
