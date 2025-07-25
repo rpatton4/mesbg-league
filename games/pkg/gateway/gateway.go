@@ -2,7 +2,7 @@
 // The package is meant to be public, and will commmit to be backwards compatible within major versions.
 // Te package primarily consists of the GamesGateway interface, with sub-packages holding different implementations
 // of the interface for calling it in-memory or over HTTP.
-package client
+package gateway
 
 import (
 	"context"

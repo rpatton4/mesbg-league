@@ -1,9 +1,11 @@
-package inbound
+package gamesprimaryadapters
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
+	"github.com/rpatton4/mesbg-league/games/internal/gamesprimaryports"
 	"github.com/rpatton4/mesbg-league/games/pkg/header"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
 	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
@@ -14,11 +16,16 @@ import (
 
 // HTTPHandler defines the HTTP handler (adapter) for Games operations received via HTTP(S).
 type HTTPHandler struct {
-	ctrl *Controller
+	ctrl *gamesprimaryports.TxnController
+}
+
+type GetByIDRequest struct {
+	// ID is the unique identifier for the game to retrieve.
+	ID header.GameID `path:"id" example:"1234" doc:"The unique identifier for the game to retrieve"`
 }
 
 // NewHTTPHandler creates a new instance of the HTTP handler for game operations.
-func NewHTTPHandler(c *Controller) *HTTPHandler {
+func NewHTTPHandler(c *gamesprimaryports.TxnController) *HTTPHandler {
 	return &HTTPHandler{ctrl: c}
 }
 
@@ -55,6 +62,18 @@ func (h *HTTPHandler) Demux(w http.ResponseWriter, r *http.Request) {
 		slog.Warn("Unsupported HTTP method on the path", "method", r.Method, "path", r.URL.Path)
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func (h *HTTPHandler) HumaGetByID(ctx context.Context, req *GetByIDRequest) (*model.Game, error) {
+	slog.Debug("humaGetByID called", "gameID", req.ID)
+
+	g, err := h.ctrl.GetByID(ctx, req.ID)
+
+	if err != nil {
+		slog.Error("Repository error for game", "gameID", req.ID, "error", err)
+	}
+
+	return g, err
 }
 
 // httpGetByID queries the controller for the game with the ID taken from the path, returns it if found

@@ -1,38 +1,33 @@
-package inbound
+package gamesprimaryports
 
 import (
 	"context"
 	"errors"
+	"github.com/rpatton4/mesbg-league/games/internal/gamessecondaryports"
 	"github.com/rpatton4/mesbg-league/games/pkg/header"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
 )
 
-type gamesRepository interface {
-	GetByID(ctx context.Context, id header.GameID) (*model.Game, error)
-	Create(ctx context.Context, g *model.Game) (*model.Game, error)
-	Replace(ctx context.Context, g *model.Game) (*model.Game, error)
-	DeleteByID(ctx context.Context, id header.GameID) bool
+// TxnController defines the simple controller for game operations.
+type TxnController struct {
+	repo gamessecondaryports.Repository
 }
 
-// Controller defines the simple controller for game operations.
-type Controller struct {
-	repo gamesRepository
-}
-
-// NewHTTPHandler creates a new instance of the games controller.
-func New(r gamesRepository) *Controller {
-	return &Controller{repo: r}
+// NewTxnController creates a new instance of the games controller for transactional behavior in the sense of realtime
+// operations on a game, versus batch
+func NewTxnController(r gamessecondaryports.Repository) *TxnController {
+	return &TxnController{repo: r}
 }
 
 // GetByID returns the game with the given id, or a svcerrors.NotFound if no game with that id exists
-func (c *Controller) GetByID(ctx context.Context, id header.GameID) (*model.Game, error) {
+func (c *TxnController) GetByID(ctx context.Context, id header.GameID) (*model.Game, error) {
 	return c.repo.GetByID(ctx, id)
 }
 
 // Create persists a new game instance to the repository and returns the game with an assigned ID.
 // A generic error is returned if the game to created is missing, while specific validation errors are
 // passed along from the repository if the game is invalid in some way.
-func (c *Controller) Create(ctx context.Context, g *model.Game) (*model.Game, error) {
+func (c *TxnController) Create(ctx context.Context, g *model.Game) (*model.Game, error) {
 	if g == nil {
 		return nil, errors.New("the game to be created cannot be nil")
 	}
@@ -41,7 +36,7 @@ func (c *Controller) Create(ctx context.Context, g *model.Game) (*model.Game, er
 
 // Replace updates an existing game in the repository with the provided game.
 // A generic error is returned if the game to replaced is not present in the data store.
-func (c *Controller) Replace(ctx context.Context, g *model.Game) (*model.Game, error) {
+func (c *TxnController) Replace(ctx context.Context, g *model.Game) (*model.Game, error) {
 	if g == nil {
 		return nil, errors.New("the game to be replaced cannot be nil")
 	}
@@ -50,7 +45,7 @@ func (c *Controller) Replace(ctx context.Context, g *model.Game) (*model.Game, e
 
 // DeleteByID removes the game with the given id from the repository. Returns true if the game was found and
 // deleted, false otherwise. This is an idempotent operation.
-func (c *Controller) DeleteByID(ctx context.Context, id header.GameID) bool {
+func (c *TxnController) DeleteByID(ctx context.Context, id header.GameID) bool {
 	if id == "" {
 		return false
 	}
