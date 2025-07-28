@@ -1,8 +1,8 @@
-package gamessecondaryports
+package secondary
 
 import (
 	"context"
-	"github.com/rpatton4/mesbg-league/games/pkg/header"
+	"github.com/rpatton4/mesbg-league/games/pkg"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
 )
 
@@ -10,7 +10,7 @@ import (
 type Repository interface {
 	// GetByID retrieves a game by ID from the repository, if no game with the given
 	// ID exists, it returns NotFound.
-	GetByID(ctx context.Context, id header.GameID) (*model.Game, error)
+	GetByID(ctx context.Context, id pkg.GameID) (*model.Game, error)
 
 	// Create persists a new game instance to the repository and returns the game with an assigned ID.
 	Create(ctx context.Context, g *model.Game) (*model.Game, error)
@@ -23,5 +23,5 @@ type Repository interface {
 
 	// DeleteByID deletes an existing game instance in the repository. Returns true if the game was found and
 	// deleted, false otherwise. This is an idempotent operation.
-	DeleteByID(ctx context.Context, id header.GameID) bool
+	DeleteByID(ctx context.Context, id pkg.GameID) (bool, error)
 }

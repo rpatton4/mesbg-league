@@ -23,14 +23,14 @@ func New() *Repository {
 }
 
 // GetByID retrieves a player by ID from the in-memory repository, if no player with the given
-// ID exists, it returns NotFound.
+// ID exists, it returns ErrNotFound.
 func (r *Repository) GetByID(_ context.Context, id model.PlayerID) (*model.Player, error) {
 	r.RLock()
 	defer r.RUnlock()
 
 	p, exists := r.data[id]
 	if !exists {
-		return nil, svcerrors.NotFound
+		return nil, svcerrors.ErrNotFound
 	}
 	return p, nil
 }
@@ -56,7 +56,7 @@ func (r *Repository) Replace(_ context.Context, p *model.Player) (*model.Player,
 	defer r.Unlock()
 
 	if p.ID == "" || r.data[p.ID] == nil {
-		return nil, svcerrors.InvalidID
+		return nil, svcerrors.ErrInvalidID
 	}
 	r.data[p.ID] = p
 	return p, nil

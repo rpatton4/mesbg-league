@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	gamesheader "github.com/rpatton4/mesbg-league/games/pkg/header"
+	gamesheader "github.com/rpatton4/mesbg-league/games/pkg"
 	games "github.com/rpatton4/mesbg-league/games/pkg/model"
 	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 	"net/http"
@@ -32,7 +32,7 @@ func (g *HTTPGateway) GetByID(ctx context.Context, id gamesheader.GameID) (*game
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusNotFound {
-		return nil, svcerrors.NotFound
+		return nil, svcerrors.ErrNotFound
 	} else if resp.StatusCode/100 != 2 {
 		return nil, fmt.Errorf("non-2xx response: %v", resp)
 	}

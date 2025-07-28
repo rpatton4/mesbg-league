@@ -22,14 +22,14 @@ func New() *Repository {
 }
 
 // Get retrieves a league by ID from the in-memory repository, if no league with the given
-// ID exists, it returns NotFound.
+// ID exists, it returns ErrNotFound.
 func (r *Repository) Get(_ context.Context, id int) (*model.League, error) {
 	r.RLock()
 	defer r.RUnlock()
 
 	league, exists := r.data[id]
 	if !exists {
-		return nil, svcerrors.NotFound
+		return nil, svcerrors.ErrNotFound
 	}
 	return league, nil
 }
@@ -42,7 +42,7 @@ func (r *Repository) Add(_ context.Context, l *model.League) (*model.League, err
 	r.data[leagueCounter] = l
 	leagueCounter++
 
-	return l, svcerrors.NotFound
+	return l, svcerrors.ErrNotFound
 }
 
 // Update updates an existing league instance in the in-memory repository.

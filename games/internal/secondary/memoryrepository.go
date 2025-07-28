@@ -1,8 +1,8 @@
-package gamessecondaryadapters
+package secondary
 
 import (
 	"context"
-	"github.com/rpatton4/mesbg-league/games/pkg/header"
+	"github.com/rpatton4/mesbg-league/games/pkg"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
 	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 	"strconv"
@@ -14,23 +14,23 @@ var gameCounter = 1
 // MemoryRepository defines an in-memory repository (adapter) for the Games service
 type MemoryRepository struct {
 	sync.RWMutex
-	data map[header.GameID]*model.Game
+	data map[pkg.GameID]*model.Game
 }
 
 // NewMemoryRepository creates a new instance of the in-memory game repository.
 func NewMemoryRepository() *MemoryRepository {
-	return &MemoryRepository{data: map[header.GameID]*model.Game{}}
+	return &MemoryRepository{data: map[pkg.GameID]*model.Game{}}
 }
 
 // GetByID retrieves a game by ID from the in-memory repository, if no game with the given
-// ID exists, it returns NotFound.
-func (r *MemoryRepository) GetByID(_ context.Context, id header.GameID) (*model.Game, error) {
+// ID exists, it returns ErrNotFound.
+func (r *MemoryRepository) GetByID(_ context.Context, id pkg.GameID) (*model.Game, error) {
 	r.RLock()
 	defer r.RUnlock()
 
 	g, exists := r.data[id]
 	if !exists {
-		return nil, svcerrors.NotFound
+		return nil, svcerrors.ErrNotFound
 	}
 
 	return g, nil
@@ -41,7 +41,7 @@ func (r *MemoryRepository) Create(_ context.Context, g *model.Game) (*model.Game
 	r.Lock()
 	defer r.Unlock()
 
-	g.ID = header.GameID(strconv.Itoa(gameCounter))
+	g.ID = pkg.GameID(strconv.Itoa(gameCounter))
 	r.data[g.ID] = g
 	gameCounter++
 
@@ -57,7 +57,7 @@ func (r *MemoryRepository) Replace(_ context.Context, g *model.Game) (*model.Gam
 	defer r.Unlock()
 
 	if g.ID == "" || r.data[g.ID] == nil {
-		return nil, svcerrors.InvalidID
+		return nil, svcerrors.ErrInvalidID
 	}
 	r.data[g.ID] = g
 	return g, nil
@@ -65,14 +65,14 @@ func (r *MemoryRepository) Replace(_ context.Context, g *model.Game) (*model.Gam
 
 // DeleteByID deletes an existing game instance in the in-memory repository. Returns true if the game was found and
 // deleted, false otherwise. This is an idempotent operation.
-func (r *MemoryRepository) DeleteByID(_ context.Context, id header.GameID) bool {
+func (r *MemoryRepository) DeleteByID(_ context.Context, id pkg.GameID) (bool, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	if r.data[id] != nil {
 		r.data[id] = nil
-		return true
+		return true, nil
 	}
 
-	return false
+	return false, svcerrors.ErrNotFound
 }

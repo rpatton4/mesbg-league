@@ -4,9 +4,8 @@ import (
 	//"context"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
-	padapters "github.com/rpatton4/mesbg-league/games/internal/gamesprimaryadapters"
-	pports "github.com/rpatton4/mesbg-league/games/internal/gamesprimaryports"
-	sadapters "github.com/rpatton4/mesbg-league/games/internal/gamessecondaryadapters"
+	padapters "github.com/rpatton4/mesbg-league/games/internal/primary"
+	sadapters "github.com/rpatton4/mesbg-league/games/internal/secondary"
 	"log/slog"
 	"net/http"
 	"os"
@@ -18,17 +17,17 @@ func main() {
 
 	slog.Info("Starting the Games service...")
 	repo := sadapters.NewMemoryRepository()
-	ctrl := pports.NewTxnController(repo)
-	handler := padapters.NewHTTPHandler(ctrl)
+	ctrl := padapters.NewTxnController(repo)
+	handler := padapters.NewHumaHandler(ctrl)
 
 	router := http.NewServeMux()
 
 	api := humago.New(router, huma.DefaultConfig("Games Service", "1.0.0"))
 
-	huma.Get(api, "/games/{id}", handler.HumaGetByID)
-	huma.Post(api, "/games", handler.HumaPost)
-	//mux.Handle("/games/{id}", http.HandlerFunc(handler.DemuxWithID))
-	//mux.Handle("/games", http.HandlerFunc(handler.Demux))
+	huma.Get(api, "/games/{id}", handler.GetByID)
+	huma.Post(api, "/games", handler.Post)
+	huma.Put(api, "/games/{id}", handler.Put)
+	huma.Delete(api, "/games/{id}", handler.Delete)
 
 	if err := http.ListenAndServe(":8081", router); err != nil {
 		slog.Error("Failed to start HTTP server", "error", err.Error())

@@ -6,7 +6,7 @@ package gateway
 
 import (
 	"context"
-	gamesheader "github.com/rpatton4/mesbg-league/games/pkg/header"
+	gamesheader "github.com/rpatton4/mesbg-league/games/pkg"
 	games "github.com/rpatton4/mesbg-league/games/pkg/model"
 )
 

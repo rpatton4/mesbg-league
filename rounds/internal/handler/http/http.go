@@ -31,7 +31,7 @@ func (h *Handler) GetRound(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	round, err := h.ctrl.Get(ctx, id)
 
-	if err != nil && errors.Is(err, svcerrors.NotFound) {
+	if err != nil && errors.Is(err, svcerrors.ErrNotFound) {
 		slog.Warn("Round not found", "roundID", id)
 		w.WriteHeader(http.StatusNotFound)
 		return

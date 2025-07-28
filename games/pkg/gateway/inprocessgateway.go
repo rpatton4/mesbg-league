@@ -2,8 +2,8 @@ package gateway
 
 import (
 	"context"
-	gamesctrl "github.com/rpatton4/mesbg-league/games/internal/gamesprimaryports"
-	gamesheader "github.com/rpatton4/mesbg-league/games/pkg/header"
+	gamesctrl "github.com/rpatton4/mesbg-league/games/internal/primary"
+	gamesheader "github.com/rpatton4/mesbg-league/games/pkg"
 	gamesmodel "github.com/rpatton4/mesbg-league/games/pkg/model"
 )
 

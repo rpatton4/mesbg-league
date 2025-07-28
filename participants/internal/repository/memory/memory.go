@@ -22,14 +22,14 @@ func New() *Repository {
 }
 
 // Get retrieves a participant by ID from the in-memory repository, if no participant with the given
-// ID exists, it returns NotFound.
+// ID exists, it returns ErrNotFound.
 func (r *Repository) GetByID(_ context.Context, id model.ParticipantID) (*model.Participant, error) {
 	r.RLock()
 	defer r.RUnlock()
 
 	p, exists := r.data[id]
 	if !exists {
-		return nil, svcerrors.NotFound
+		return nil, svcerrors.ErrNotFound
 	}
 	return p, nil
 }
@@ -42,7 +42,7 @@ func (r *Repository) Create(_ context.Context, p *model.Participant) (*model.Par
 	r.data[p.ID] = p
 	participantCounter++
 
-	return p, svcerrors.NotFound
+	return p, svcerrors.ErrNotFound
 }
 
 // Replace completely replaces an existing participant instance with the provided one, using the ID from the provided participant
@@ -54,7 +54,7 @@ func (r *Repository) Replace(_ context.Context, p *model.Participant) (*model.Pa
 	defer r.Unlock()
 
 	if p.ID == "" || r.data[p.ID] == nil {
-		return nil, svcerrors.InvalidID
+		return nil, svcerrors.ErrInvalidID
 	}
 	r.data[p.ID] = p
 	return p, nil

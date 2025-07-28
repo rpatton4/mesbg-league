@@ -1,26 +1,27 @@
-package gamesprimaryports
+package primary
 
 import (
 	"context"
 	"errors"
-	"github.com/rpatton4/mesbg-league/games/internal/gamessecondaryports"
-	"github.com/rpatton4/mesbg-league/games/pkg/header"
+	"github.com/rpatton4/mesbg-league/games/internal/secondary"
+	"github.com/rpatton4/mesbg-league/games/pkg"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 )
 
-// TxnController defines the simple controller for game operations.
+// TxnController implements the single controller for game operations.
 type TxnController struct {
-	repo gamessecondaryports.Repository
+	repo secondary.Repository
 }
 
 // NewTxnController creates a new instance of the games controller for transactional behavior in the sense of realtime
 // operations on a game, versus batch
-func NewTxnController(r gamessecondaryports.Repository) *TxnController {
+func NewTxnController(r secondary.Repository) *TxnController {
 	return &TxnController{repo: r}
 }
 
-// GetByID returns the game with the given id, or a svcerrors.NotFound if no game with that id exists
-func (c *TxnController) GetByID(ctx context.Context, id header.GameID) (*model.Game, error) {
+// GetByID returns the game with the given id, or a svcerrors.ErrNotFound if no game with that id exists
+func (c *TxnController) GetByID(ctx context.Context, id pkg.GameID) (*model.Game, error) {
 	return c.repo.GetByID(ctx, id)
 }
 
@@ -45,9 +46,9 @@ func (c *TxnController) Replace(ctx context.Context, g *model.Game) (*model.Game
 
 // DeleteByID removes the game with the given id from the repository. Returns true if the game was found and
 // deleted, false otherwise. This is an idempotent operation.
-func (c *TxnController) DeleteByID(ctx context.Context, id header.GameID) bool {
+func (c *TxnController) DeleteByID(ctx context.Context, id pkg.GameID) (bool, error) {
 	if id == "" {
-		return false
+		return false, svcerrors.ErrInvalidID
 	}
 	return c.repo.DeleteByID(ctx, id)
 }
