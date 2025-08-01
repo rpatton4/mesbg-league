@@ -9,7 +9,7 @@ import (
 // Repository defines the port for writing Games to persistent storage
 type Repository interface {
 	// GetByID retrieves a game by ID from the repository, if no game with the given
-	// ID exists, it returns NotFound.
+	// ID exists, it returns nil, svcerrors.ErrNotFound.
 	GetByID(ctx context.Context, id pkg.GameID) (*model.Game, error)
 
 	// Create persists a new game instance to the repository and returns the game with an assigned ID.

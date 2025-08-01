@@ -11,11 +11,13 @@ import (
 	"os"
 )
 
+var port = "8081"
+
 func main() {
 	logHandler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
 	slog.SetDefault(slog.New(logHandler))
 
-	slog.Info("Starting the Games service...")
+	slog.Info("Starting the Games service on port " + port)
 	repo := sadapters.NewMemoryRepository()
 	ctrl := padapters.NewTxnController(repo)
 	handler := padapters.NewHumaHandler(ctrl)
@@ -29,7 +31,7 @@ func main() {
 	huma.Put(api, "/games/{id}", handler.Put)
 	huma.Delete(api, "/games/{id}", handler.Delete)
 
-	if err := http.ListenAndServe(":8081", router); err != nil {
+	if err := http.ListenAndServe(":"+port, router); err != nil {
 		slog.Error("Failed to start HTTP server", "error", err.Error())
 		panic(err)
 	}

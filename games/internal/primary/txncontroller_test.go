@@ -4,6 +4,7 @@ import (
 	"github.com/rpatton4/mesbg-league/games/internal/secondary"
 	games "github.com/rpatton4/mesbg-league/games/pkg"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
+	rounds "github.com/rpatton4/mesbg-league/rounds/pkg"
 	"testing"
 )
 
@@ -48,7 +49,7 @@ func TestTxnControllerReplaceGame(t *testing.T) {
 	ctrl := createController()
 	originalScore := 20
 	updatedScore := 30
-	originalRoundID := "999"
+	originalRoundID := rounds.RoundID("999")
 
 	// Create the game to search for
 	g := createFakeGame()

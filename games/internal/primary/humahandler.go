@@ -40,7 +40,7 @@ type GetByIDResponse struct {
 // PostRequest defines the input for the Post operation, which creates a new game.
 type PostRequest struct {
 	// Body holds the info for the game to be created
-	Body model.Game
+	Body *model.Game
 }
 
 type PostResponse struct {
@@ -54,7 +54,7 @@ type PutRequest struct {
 	ID games.GameID `path:"id" example:"1234" doc:"The unique identifier for the game to update"`
 
 	// Body holds the Game model to be used to update the game with the ID from the path
-	Body model.Game
+	Body *model.Game
 }
 
 type PutResponse struct {
@@ -78,7 +78,7 @@ func NewHumaHandler(c SingleController) *HumaHandler {
 // GetByID queries the controller for the game with the ID taken from the path, returns it if found
 // 404 is returned if no such game exists
 // 400 is returned if the game ID is invalid
-func (h *HumaHandler) GetByID(ctx context.Context, req *GetByIDRequest) (*GetByIDResponse, huma.StatusError) {
+func (h *HumaHandler) GetByID(ctx context.Context, req *GetByIDRequest) (*GetByIDResponse, error) {
 	slog.Debug("GetByID called", "gameID", req.ID)
 
 	g, err := h.ctrl.GetByID(ctx, req.ID)
@@ -102,11 +102,17 @@ func (h *HumaHandler) GetByID(ctx context.Context, req *GetByIDRequest) (*GetByI
 // 500 is returned if the game cannot be created for any reason
 func (h *HumaHandler) Post(ctx context.Context, req *PostRequest) (*PostResponse, error) {
 	slog.Debug("Post called", "PostRequest Body", req.Body)
-	g, err := h.ctrl.Create(ctx, &req.Body)
+	g, err := h.ctrl.Create(ctx, req.Body)
 
 	if err != nil {
 		slog.Error("Unable to create the game", "func", "Post", "error", err)
-		return nil, huma.Error500InternalServerError("Error while creating the game: " + err.Error())
+		if errors.Is(err, svcerrors.ErrModelMissing) {
+			return nil, huma.Error400BadRequest("Client did not send a game when requesting game creation: " + err.Error())
+		} else if errors.Is(err, svcerrors.ErrModelInvalid) {
+			return nil, huma.Error400BadRequest("Client sent invalid game when requesting game creation: " + err.Error())
+		} else {
+			return nil, huma.Error500InternalServerError("Error while creating the game: " + err.Error())
+		}
 	}
 	slog.Debug("Created game", "game", g)
 	return &PostResponse{
@@ -119,13 +125,23 @@ func (h *HumaHandler) Post(ctx context.Context, req *PostRequest) (*PostResponse
 // 500 is returned if the game cannot be created for any reason
 func (h *HumaHandler) Put(ctx context.Context, req *PutRequest) (*PutResponse, error) {
 	slog.Debug("Put called", "PutRequest Body", req.Body)
-	g, err := h.ctrl.Replace(ctx, &req.Body)
+	g, err := h.ctrl.Replace(ctx, req.Body)
 
 	if err != nil {
-		slog.Error("Unable to create the game", "func", "Post", "error", err)
-		return nil, huma.Error500InternalServerError("Error while creating the game: " + err.Error())
+		slog.Error("Unable to update the game", "func", "Put", "error", err)
+		if errors.Is(err, svcerrors.ErrModelMissing) {
+			return nil, huma.Error400BadRequest("client did not send a game when requesting game update: " + err.Error())
+		} else if errors.Is(err, svcerrors.ErrInvalidID) {
+			return nil, huma.Error400BadRequest("client sent invalid game ID '" + string(req.Body.ID) + "' when requesting game update: " + err.Error())
+		} else if errors.Is(err, svcerrors.ErrModelInvalid) {
+			return nil, huma.Error400BadRequest("client sent invalid game when requesting game update: " + err.Error())
+		} else if errors.Is(err, svcerrors.ErrNotFound) {
+			return nil, huma.Error400BadRequest("client sent a game with an ID which can't be found, '" + string(req.Body.ID) + "', when requesting game update: " + err.Error())
+		} else {
+			return nil, huma.Error500InternalServerError("error while updating the game: " + err.Error())
+		}
 	}
-	slog.Debug("Created game", "game", g)
+	slog.Debug("Updated game", "game", g)
 	return &PutResponse{
 		Body: *g,
 	}, nil

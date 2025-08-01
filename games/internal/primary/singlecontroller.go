@@ -6,6 +6,7 @@ import (
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
 )
 
+//go:generate mockgen --destination ./mocks/controller.go github.com/rpatton4/mesbg-league/games/internal/primary SingleController
 type SingleController interface {
 	// GetByID returns the game with the given id, or a svcerrors.ErrNotFound if no game with that id exists
 	GetByID(ctx context.Context, id games.GameID) (*model.Game, error)

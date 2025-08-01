@@ -2,12 +2,11 @@ package model
 
 import (
 	"github.com/rpatton4/mesbg-league/pkg/auth"
+	player "github.com/rpatton4/mesbg-league/players/pkg"
 )
 
-type PlayerID string
-
 type Player struct {
-	ID            PlayerID        `json:"id"`
+	ID            player.PlayerID `json:"id"`
 	Name          string          `json:"name"`
 	DiscordName   string          `json:"discordName"`
 	SocialMediaID string          `json:"socialMediaUserId"`

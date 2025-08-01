@@ -1,7 +1,12 @@
 package model
 
 import (
+	"encoding/json"
 	games "github.com/rpatton4/mesbg-league/games/pkg"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
+	players "github.com/rpatton4/mesbg-league/players/pkg"
+	rounds "github.com/rpatton4/mesbg-league/rounds/pkg"
+	"log/slog"
 )
 
 type Game struct {
@@ -10,14 +15,14 @@ type Game struct {
 
 	// Side1ID is the identifier of the player for the first side in the game.
 	// First does not imply that this player acts first, it is simply a designator
-	Side1ID string `json:"side1Id" example:"5678" doc:"The unique identifier for the first side in the game"`
+	Side1ID players.PlayerID `json:"side1Id" example:"5678" doc:"The unique identifier for the first side in the game"`
 
 	// Side2ID is the identifier of the player for the second side in the game.
 	// Second does not imply that this player acts second, it is simply a designator
-	Side2ID string `json:"side2Id" example:"9999" doc:"The unique identifier for the second side in the game"`
+	Side2ID players.PlayerID `json:"side2Id" example:"9999" doc:"The unique identifier for the second side in the game"`
 
 	// RoundID is the key to the round in a league which this game is part of
-	RoundID string `json:"roundId" example:"9876" doc:"The unique identifier for the round associated with this game, if there is one"`
+	RoundID rounds.RoundID `json:"roundId" example:"9876" doc:"The unique identifier for the round associated with this game, if there is one"`
 
 	// Side1TotalVictoryPoints is the total victory points scored by the first side in the game
 	Side1TotalVictoryPoints int `json:"side1TotalVictoryPoints,omitempty" example:"12" doc:"The total number of victory points scored by the first player"`
@@ -34,4 +39,36 @@ type Game struct {
 	// Status is used to track whether the game is scheduled, played, conceded etc.
 	// See the GameStateXYZ constants for potential values.
 	Status games.GameState `json:"status,omitempty" example:"1" doc:"The current state of the game, indicating whether it is scheduled, in progress, completed etc."`
+}
+
+// IsValid checks if the game instance has all required fields set and returns a boolean indicating validity. A slice
+// of strings is returned containing information about any invalid fields, one entry per field, and an error is returned
+// if validity cannot be determined, for example if the game instance is nil.
+func (g *Game) IsValid() (bool, []string, error) {
+	invalidFields := []string{}
+	if g == nil {
+		return false, invalidFields, svcerrors.ErrModelMissing
+	}
+
+	if g.Side1ID == "" || g.Side2ID == "" || g.Status == 0 {
+		j, err := json.Marshal(g)
+		if err != nil {
+			slog.Error("Unable to marshall the game instance to json", "func", "IsValid", "game json", "error", err)
+		}
+		slog.Warn("Game is missing required fields", "game json", string(j))
+
+		if g.Side1ID == "" {
+			invalidFields = append(invalidFields, "Side1ID='"+string(g.Side1ID)+"'")
+		}
+		if g.Side2ID == "" {
+			invalidFields = append(invalidFields, "Side2ID='"+string(g.Side2ID)+"'")
+		}
+		if g.Status == 0 {
+			invalidFields = append(invalidFields, "Status is not set")
+		}
+
+		return false, invalidFields, nil
+	} else {
+		return true, invalidFields, nil
+	}
 }

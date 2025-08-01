@@ -4,13 +4,13 @@ import (
 	gamesheader "github.com/rpatton4/mesbg-league/games/pkg"
 	games "github.com/rpatton4/mesbg-league/games/pkg/model"
 	leagues "github.com/rpatton4/mesbg-league/leagues/pkg/header"
-	"github.com/rpatton4/mesbg-league/rounds/pkg/header"
+	"github.com/rpatton4/mesbg-league/rounds/pkg"
 )
 
 // Round models one round of games in a league, linking the games scheduled and played for that round to the league
 type Round struct {
 	// ID is the unique identifier for the round
-	ID header.RoundID `json:"id,omitempty"`
+	ID pkg.RoundID `json:"id,omitempty"`
 
 	// LeagueID is the key to the league this round belongs to
 	LeagueID leagues.LeagueID `json:"leagueId"`
@@ -28,7 +28,7 @@ type Round struct {
 
 type ShallowRound struct {
 	// ID is the unique identifier for the round
-	ID header.RoundID `json:"id,omitempty"`
+	ID pkg.RoundID `json:"id,omitempty"`
 
 	// LeagueID is the key to the league this round belongs to
 	LeagueID leagues.LeagueID `json:"leagueId"`
