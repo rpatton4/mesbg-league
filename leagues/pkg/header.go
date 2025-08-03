@@ -1,3 +1,3 @@
-package header
+package pkg
 
 type LeagueID string

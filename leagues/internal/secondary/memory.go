@@ -1,7 +1,8 @@
-package memory
+package secondary
 
 import (
 	"context"
+	"github.com/rpatton4/mesbg-league/leagues/pkg"
 	"github.com/rpatton4/mesbg-league/leagues/pkg/model"
 	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 	"strconv"
@@ -13,12 +14,12 @@ var leagueCounter = 1
 // Repository defines an in-memory repository for league data
 type Repository struct {
 	sync.RWMutex
-	data map[int]*model.League
+	data map[pkg.LeagueID]*model.League
 }
 
 // New creates a new instance of the in-memory league repository.
 func New() *Repository {
-	return &Repository{data: map[int]*model.League{}}
+	return &Repository{data: map[pkg.LeagueID]*model.League{}}
 }
 
 // Get retrieves a league by ID from the in-memory repository, if no league with the given
@@ -38,7 +39,7 @@ func (r *Repository) Get(_ context.Context, id int) (*model.League, error) {
 func (r *Repository) Add(_ context.Context, l *model.League) (*model.League, error) {
 	r.Lock()
 	defer r.Unlock()
-	l.ID = strconv.Itoa(leagueCounter)
+	l.ID = pkg.LeagueID(strconv.Itoa(leagueCounter))
 	r.data[leagueCounter] = l
 	leagueCounter++
 
@@ -50,7 +51,7 @@ func (r *Repository) Update(_ context.Context, l *model.League) (*model.League, 
 	r.Lock()
 	defer r.Unlock()
 
-	id, _ := strconv.Atoi(l.ID)
+	id := string(l.ID)
 	r.data[id] = l
 
 	return l, nil

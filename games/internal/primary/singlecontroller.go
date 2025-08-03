@@ -2,6 +2,7 @@ package primary
 
 import (
 	"context"
+	"github.com/rpatton4/mesbg-league/games/internal/secondary"
 	games "github.com/rpatton4/mesbg-league/games/pkg"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
 )
@@ -23,4 +24,13 @@ type SingleController interface {
 	// DeleteByID removes the game with the given id from the repository. Returns true if the game was found and
 	// deleted, false otherwise. This is an idempotent operation.
 	DeleteByID(ctx context.Context, id games.GameID) (bool, error)
+}
+
+// NewDefaultSingleController creates an instance of the default single controller implementation. This default is controlled
+// by configuration.
+// TODO: Implement the configuration control for this
+func NewDefaultSingleController(repo secondary.Repository) SingleController {
+	return &TxnController{
+		repo: repo,
+	}
 }

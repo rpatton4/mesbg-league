@@ -1,18 +1,17 @@
 package main
 
 import (
-	"github.com/rpatton4/mesbg-league/leagues/internal/controller/leagues"
-	handlerhttp "github.com/rpatton4/mesbg-league/leagues/internal/handler/http"
-	"github.com/rpatton4/mesbg-league/leagues/internal/repository/memory"
+	"github.com/rpatton4/mesbg-league/leagues/internal/primary"
+	"github.com/rpatton4/mesbg-league/leagues/internal/secondary"
 	"log/slog"
 	"net/http"
 )
 
 func main() {
 	slog.Info("Starting the Leagues service...")
-	repo := memory.New()
-	ctrl := leagues.New(repo)
-	handler := handlerhttp.New(ctrl)
+	repo := secondary.New()
+	ctrl := primary.New(repo)
+	handler := primary.New(ctrl)
 
 	http.Handle("/leagues", http.HandlerFunc(handler.GetLeague))
 	if err := http.ListenAndServe(":8082", nil); err != nil {

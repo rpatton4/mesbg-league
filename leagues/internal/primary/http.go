@@ -1,10 +1,9 @@
-package http
+package primary
 
 import (
 	"encoding/json"
 	"errors"
-	"github.com/rpatton4/mesbg-league/leagues/internal/controller/leagues"
-	"github.com/rpatton4/mesbg-league/svcerrors"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -12,11 +11,11 @@ import (
 
 // Handler defines the HTTP handler for league operations.
 type Handler struct {
-	ctrl *leagues.Controller
+	ctrl *Controller
 }
 
 // New creates a new instance of the HTTP handler for league operations.
-func New(c *leagues.Controller) *Handler {
+func New(c *Controller) *Handler {
 	return &Handler{ctrl: c}
 }
 
@@ -31,7 +30,7 @@ func (h *Handler) GetLeague(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	p, err := h.ctrl.Get(ctx, id)
 
-	if err != nil && errors.Is(err, svcerrors.NotFound) {
+	if err != nil && errors.Is(err, svcerrors.ErrNotFound) {
 		slog.Warn("League not found", "leagueID", id)
 		w.WriteHeader(http.StatusNotFound)
 		return

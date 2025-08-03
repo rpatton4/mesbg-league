@@ -25,3 +25,10 @@ type Repository interface {
 	// deleted, false otherwise. This is an idempotent operation.
 	DeleteByID(ctx context.Context, id pkg.GameID) (bool, error)
 }
+
+// NewDefaultRepository creates an instance of the default repository implementation. This default is controlled
+// by configuration.
+// TODO: Implement the configuration control for this
+func NewDefaultRepository() Repository {
+	return NewMemoryRepository()
+}
