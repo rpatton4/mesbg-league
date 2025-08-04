@@ -56,7 +56,7 @@ func (g *Game) IsValid() (bool, []string, error) {
 	if g.Side1ID == "" || g.Side2ID == "" || g.Status == 0 {
 		j, err := json.Marshal(g)
 		if err != nil {
-			slog.Error("Unable to marshall the game instance to json", "func", "IsValid", "game json", "error", err)
+			slog.Error("Unable to marshall the game instance to json", "func", "IsValid", "error", err.Error())
 		}
 		slog.Warn("Game is missing required fields", "game json", string(j))
 

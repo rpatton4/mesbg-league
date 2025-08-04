@@ -14,7 +14,7 @@ type Controller struct {
 	repo leagueRepository
 }
 
-// New creates a new instance of the league controller.
+// NewHandler creates a new instance of the league controller.
 func New(r leagueRepository) *Controller {
 	return &Controller{repo: r}
 }

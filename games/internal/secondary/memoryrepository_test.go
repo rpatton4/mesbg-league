@@ -3,6 +3,7 @@ package secondary
 import (
 	games "github.com/rpatton4/mesbg-league/games/pkg"
 	"github.com/rpatton4/mesbg-league/games/pkg/model"
+	rounds "github.com/rpatton4/mesbg-league/rounds/pkg"
 	"testing"
 )
 
@@ -50,7 +51,7 @@ func TestMemoryRepoReplaceGame(t *testing.T) {
 	r = NewMemoryRepository()
 	originalScore := 20
 	updatedScore := 30
-	originalRoundID := "999"
+	originalRoundID := rounds.RoundID("999")
 
 	// Create the game to search for
 	g := createFakeGame()
@@ -133,6 +134,6 @@ func createFakeGame() *model.Game {
 		Side2TotalVictoryPoints: 15,
 		Side1KilledGeneral:      true,
 		Side2KilledGeneral:      true,
-		Status:                  model.GameStatePlayCompleted,
+		Status:                  games.GameStatePlayCompleted,
 	}
 }

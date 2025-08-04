@@ -3,14 +3,15 @@ package players
 import (
 	"context"
 	"errors"
+	players "github.com/rpatton4/mesbg-league/players/pkg"
 	"github.com/rpatton4/mesbg-league/players/pkg/model"
 )
 
 type playerRepository interface {
-	GetByID(ctx context.Context, id model.PlayerID) (*model.Player, error)
+	GetByID(ctx context.Context, id players.PlayerID) (*model.Player, error)
 	Create(ctx context.Context, p *model.Player) (*model.Player, error)
 	Replace(ctx context.Context, p *model.Player) (*model.Player, error)
-	DeleteByID(ctx context.Context, id model.PlayerID) bool
+	DeleteByID(ctx context.Context, id players.PlayerID) bool
 }
 
 // Controller defines the simple controller for player operations.
@@ -24,7 +25,7 @@ func New(r playerRepository) *Controller {
 }
 
 // GetByID returns the player with the given id, or svcerrors.NotFound if no player with that id exists
-func (c *Controller) GetByID(ctx context.Context, id model.PlayerID) (*model.Player, error) {
+func (c *Controller) GetByID(ctx context.Context, id players.PlayerID) (*model.Player, error) {
 	return c.repo.GetByID(ctx, id)
 }
 
@@ -49,7 +50,7 @@ func (c *Controller) Replace(ctx context.Context, p *model.Player) (*model.Playe
 
 // DeleteByID removes the player with the given id from the repository. Returns true if the player was found and
 // deleted, false otherwise. This is an idempotent operation.
-func (c *Controller) DeleteByID(ctx context.Context, id model.PlayerID) bool {
+func (c *Controller) DeleteByID(ctx context.Context, id players.PlayerID) bool {
 	if id == "" {
 		return false
 	}

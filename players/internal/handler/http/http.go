@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/rpatton4/mesbg-league/players/internal/controller/players"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
+	ctrl "github.com/rpatton4/mesbg-league/players/internal/controller/players"
+	players "github.com/rpatton4/mesbg-league/players/pkg"
 	"github.com/rpatton4/mesbg-league/players/pkg/model"
-	"github.com/rpatton4/mesbg-league/svcerrors"
 	"io"
 	"log/slog"
 	"net/http"
@@ -14,18 +15,18 @@ import (
 
 // Handler defines the HTTP handler for players operations.
 type Handler struct {
-	ctrl *players.Controller
+	ctrl *ctrl.Controller
 }
 
 // New creates a new instance of the HTTP handler for players operations.
-func New(c *players.Controller) *Handler {
+func New(c *ctrl.Controller) *Handler {
 	return &Handler{ctrl: c}
 }
 
 // DemuxWithID takes a request with a player ID at the end of the path and routes it to the appropriate handler method.
 // Assumes the path has a value called "id" which is a player ID
 func (h *Handler) DemuxWithID(w http.ResponseWriter, r *http.Request) {
-	id := model.PlayerID(r.PathValue("id"))
+	id := players.PlayerID(r.PathValue("id"))
 	slog.Debug("DemuxWithID called", "id", id)
 
 	switch r.Method {
@@ -57,13 +58,13 @@ func (h *Handler) Demux(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func httpGetByID(h *Handler, w http.ResponseWriter, r *http.Request, id model.PlayerID) {
+func httpGetByID(h *Handler, w http.ResponseWriter, r *http.Request, id players.PlayerID) {
 	slog.Debug("httpGetByID called", "playerID", id)
 
 	ctx := r.Context()
-	g, err := h.ctrl.GetByID(ctx, model.PlayerID(id))
+	g, err := h.ctrl.GetByID(ctx, players.PlayerID(id))
 
-	if err != nil && errors.Is(err, svcerrors.NotFound) {
+	if err != nil && errors.Is(err, svcerrors.ErrNotFound) {
 		slog.Warn("Player not found", "playerID", id)
 		http.Error(w, "Player not found", http.StatusNotFound)
 		return
@@ -111,7 +112,7 @@ func httpPost(h *Handler, w http.ResponseWriter, r *http.Request) {
 
 // httpPutWithID replaces the player with the given ID from the path with the one passed in.
 // Any errors or ok responses are sent directly out to the HTTP stream
-func httpPutWithID(h *Handler, w http.ResponseWriter, r *http.Request, id model.PlayerID) {
+func httpPutWithID(h *Handler, w http.ResponseWriter, r *http.Request, id players.PlayerID) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		slog.Error("Failed to read request body", "error", err)
@@ -148,7 +149,7 @@ func httpPutWithID(h *Handler, w http.ResponseWriter, r *http.Request, id model.
 
 // httpDeleteByID deletes the player with the given ID from the path.
 // Any errors or ok responses are sent directly out to the HTTP stream
-func httpDeleteByID(h *Handler, w http.ResponseWriter, r *http.Request, id model.PlayerID) {
+func httpDeleteByID(h *Handler, w http.ResponseWriter, r *http.Request, id players.PlayerID) {
 	slog.Info("httpDeleteByID called", "playerID", id)
 	ok := h.ctrl.DeleteByID(r.Context(), id)
 	if !ok {

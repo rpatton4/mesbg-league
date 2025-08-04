@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/rpatton4/mesbg-league/participants/internal/controller/participants"
 	"github.com/rpatton4/mesbg-league/participants/pkg/model"
-	"github.com/rpatton4/mesbg-league/svcerrors"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 	"io"
 	"log/slog"
 	"net/http"
@@ -63,7 +63,7 @@ func httpGetByID(h *Handler, w http.ResponseWriter, r *http.Request, id model.Pa
 	ctx := r.Context()
 	g, err := h.ctrl.GetByID(ctx, model.ParticipantID(id))
 
-	if err != nil && errors.Is(err, svcerrors.NotFound) {
+	if err != nil && errors.Is(err, svcerrors.ErrNotFound) {
 		slog.Warn("Participant not found", "participantID", id)
 		http.Error(w, "Participant not found", http.StatusNotFound)
 		return

@@ -14,8 +14,8 @@ type Handler struct {
 	ctrl *Controller
 }
 
-// New creates a new instance of the HTTP handler for league operations.
-func New(c *Controller) *Handler {
+// NewHandler creates a new instance of the HTTP handler for league operations.
+func NewHandler(c *Controller) *Handler {
 	return &Handler{ctrl: c}
 }
 

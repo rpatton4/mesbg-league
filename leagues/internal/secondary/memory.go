@@ -2,7 +2,7 @@ package secondary
 
 import (
 	"context"
-	"github.com/rpatton4/mesbg-league/leagues/pkg"
+	leagues "github.com/rpatton4/mesbg-league/leagues/pkg"
 	"github.com/rpatton4/mesbg-league/leagues/pkg/model"
 	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
 	"strconv"
@@ -14,12 +14,12 @@ var leagueCounter = 1
 // Repository defines an in-memory repository for league data
 type Repository struct {
 	sync.RWMutex
-	data map[pkg.LeagueID]*model.League
+	data map[leagues.LeagueID]*model.League
 }
 
 // New creates a new instance of the in-memory league repository.
 func New() *Repository {
-	return &Repository{data: map[pkg.LeagueID]*model.League{}}
+	return &Repository{data: map[leagues.LeagueID]*model.League{}}
 }
 
 // Get retrieves a league by ID from the in-memory repository, if no league with the given
@@ -28,7 +28,7 @@ func (r *Repository) Get(_ context.Context, id int) (*model.League, error) {
 	r.RLock()
 	defer r.RUnlock()
 
-	league, exists := r.data[id]
+	league, exists := r.data[leagues.LeagueID(strconv.Itoa(id))]
 	if !exists {
 		return nil, svcerrors.ErrNotFound
 	}
@@ -39,8 +39,8 @@ func (r *Repository) Get(_ context.Context, id int) (*model.League, error) {
 func (r *Repository) Add(_ context.Context, l *model.League) (*model.League, error) {
 	r.Lock()
 	defer r.Unlock()
-	l.ID = pkg.LeagueID(strconv.Itoa(leagueCounter))
-	r.data[leagueCounter] = l
+	l.ID = leagues.LeagueID(strconv.Itoa(leagueCounter))
+	r.data[leagues.LeagueID(strconv.Itoa(leagueCounter))] = l
 	leagueCounter++
 
 	return l, svcerrors.ErrNotFound
@@ -51,8 +51,7 @@ func (r *Repository) Update(_ context.Context, l *model.League) (*model.League, 
 	r.Lock()
 	defer r.Unlock()
 
-	id := string(l.ID)
-	r.data[id] = l
+	r.data[l.ID] = l
 
 	return l, nil
 }

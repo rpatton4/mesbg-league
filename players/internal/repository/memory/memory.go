@@ -3,6 +3,7 @@ package memory
 import (
 	"context"
 	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
+	players "github.com/rpatton4/mesbg-league/players/pkg"
 	"github.com/rpatton4/mesbg-league/players/pkg/model"
 	"strconv"
 	"sync"
@@ -14,17 +15,17 @@ var playerCounter = 1
 // Repository defines an in-memory repository for players data
 type Repository struct {
 	sync.RWMutex
-	data map[model.PlayerID]*model.Player
+	data map[players.PlayerID]*model.Player
 }
 
 // New creates a new instance of the in-memory players repository.
 func New() *Repository {
-	return &Repository{data: map[model.PlayerID]*model.Player{}}
+	return &Repository{data: map[players.PlayerID]*model.Player{}}
 }
 
 // GetByID retrieves a player by ID from the in-memory repository, if no player with the given
 // ID exists, it returns ErrNotFound.
-func (r *Repository) GetByID(_ context.Context, id model.PlayerID) (*model.Player, error) {
+func (r *Repository) GetByID(_ context.Context, id players.PlayerID) (*model.Player, error) {
 	r.RLock()
 	defer r.RUnlock()
 
@@ -40,7 +41,7 @@ func (r *Repository) Create(_ context.Context, p *model.Player) (*model.Player, 
 	r.Lock()
 	defer r.Unlock()
 
-	p.ID = model.PlayerID(strconv.Itoa(playerCounter))
+	p.ID = players.PlayerID(strconv.Itoa(playerCounter))
 	r.data[p.ID] = p
 	playerCounter++
 
@@ -64,7 +65,7 @@ func (r *Repository) Replace(_ context.Context, p *model.Player) (*model.Player,
 
 // DeleteByID deletes an existing player instance in the in-memory repository. Returns true if the player was found and
 // deleted, false otherwise. This is an idempotent operation.
-func (r *Repository) DeleteByID(_ context.Context, id model.PlayerID) bool {
+func (r *Repository) DeleteByID(_ context.Context, id players.PlayerID) bool {
 	r.Lock()
 	defer r.Unlock()
 

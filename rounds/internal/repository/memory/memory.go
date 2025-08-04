@@ -2,8 +2,9 @@ package memory
 
 import (
 	"context"
+	"github.com/rpatton4/mesbg-league/pkg/svcerrors"
+	rounds "github.com/rpatton4/mesbg-league/rounds/pkg"
 	"github.com/rpatton4/mesbg-league/rounds/pkg/model"
-	"github.com/rpatton4/mesbg-league/svcerrors"
 	"strconv"
 	"sync"
 )
@@ -14,12 +15,12 @@ var roundCounter = 1
 // Repository defines an in-memory repository for players data
 type Repository struct {
 	sync.RWMutex
-	data map[int]*model.Round
+	data map[rounds.RoundID]*model.Round
 }
 
 // New creates a new instance of the in-memory round repository.
 func New() *Repository {
-	return &Repository{data: map[int]*model.Round{}}
+	return &Repository{data: map[rounds.RoundID]*model.Round{}}
 }
 
 // Get retrieves a round by ID from the in-memory repository, if no round with the given
@@ -28,9 +29,9 @@ func (repo *Repository) Get(_ context.Context, id int) (*model.Round, error) {
 	repo.RLock()
 	defer repo.RUnlock()
 
-	round, exists := repo.data[id]
+	round, exists := repo.data[rounds.RoundID(strconv.Itoa(id))]
 	if !exists {
-		return nil, svcerrors.NotFound
+		return nil, svcerrors.ErrNotFound
 	}
 	return round, nil
 }
@@ -39,11 +40,11 @@ func (repo *Repository) Get(_ context.Context, id int) (*model.Round, error) {
 func (repo *Repository) Add(_ context.Context, round *model.Round) (*model.Round, error) {
 	repo.Lock()
 	defer repo.Unlock()
-	round.ID = strconv.Itoa(roundCounter)
-	repo.data[roundCounter] = round
+	round.ID = rounds.RoundID(strconv.Itoa(roundCounter))
+	repo.data[rounds.RoundID(strconv.Itoa(roundCounter))] = round
 	roundCounter++
 
-	return round, svcerrors.NotFound
+	return round, svcerrors.ErrNotFound
 }
 
 // Update updates an existing round instance in the in-memory repository.
@@ -51,8 +52,7 @@ func (repo *Repository) Update(_ context.Context, r *model.Round) (*model.Round,
 	repo.Lock()
 	defer repo.Unlock()
 
-	id, _ := strconv.Atoi(r.ID)
-	repo.data[id] = r
+	repo.data[r.ID] = r
 
 	return r, nil
 }

@@ -11,7 +11,7 @@ func main() {
 	slog.Info("Starting the Leagues service...")
 	repo := secondary.New()
 	ctrl := primary.New(repo)
-	handler := primary.New(ctrl)
+	handler := primary.NewHandler(ctrl)
 
 	http.Handle("/leagues", http.HandlerFunc(handler.GetLeague))
 	if err := http.ListenAndServe(":8082", nil); err != nil {
